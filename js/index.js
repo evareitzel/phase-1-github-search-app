@@ -2,35 +2,36 @@ const searchInput = document.getElementById('search');
 const submitBtn = document.getElementById('github-form');
 const userList = document.querySelector('#user-list');
 
-submitBtn.addEventListener('submit', userSearch);
+submitBtn.addEventListener('submit', fetchInfo);
 
-function userSearch(event){
+function fetchInfo(event) {
   event.preventDefault();
-  console.log(searchInput.value) //grab textfield input
   fetch(`https://api.github.com/search/users?q=${searchInput.value}`, {
     headers: {
       Accept: 'application/vnd.github.v3+json'
     }
   })
-  .then(resp => resp.json())
-  // .then(resp => { console.log(resp.items[0]);
-  .then(resp => {
-    for(let i = 0; i < 1000; i++) {
-      const result = document.createElement('li');
-      userList.append(result);  
-      const avatar   = resp.items[i].avatar_url;
-      const name     = resp.items[i].login;
-      const htmlText = resp.items[i].html_url;
-      // Avatar image
-      const avatarImg = document.createElement('img');
-      avatarImg.src = avatar; // make image
-      // Profile link
-      const profile = document.createElement('a');
-      profile.textContent = "View profile";
-      profile.href = htmlText; 
-      userList.append(profile);
-      // Append avatar and name to DOM
-      result.innerText = `${avatarImg} | ${name}`;
-    }
-  })
+    .then(resp => resp.json())
+    // .then(resp => { console.log(resp.items);
+    .then(resp => resp.items.forEach(userSearch));
 }
+
+function userSearch(user) {
+// console.log(user);
+
+    // Avatar
+    const avatar = document.createElement('img');
+    avatar.src = user.avatar_url; // make image
+
+    // Name
+    const name = document.createElement('h3');
+    name.textContent = user.login;
+
+    // Profile link
+    const profile = document.createElement('a');
+    profile.textContent = "View profile";
+    profile.href = user.html_url;
+    
+    // Append user to DOM
+    userList.append(avatar, name, profile,);
+  }
